@@ -20,12 +20,9 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({ question, onAnswer 
             layoutId="cat-indicator"
             className="px-3 py-1 border border-white/10 bg-white/[0.05] text-[9px] font-mono uppercase tracking-[0.3em] text-white/60"
           >
-            {question.category}
+            {question.category === 'maturity' ? 'Business Stage' : question.category === 'brand' ? 'Brand Clarity' : question.category}
           </motion.div>
           <div className="h-[1px] flex-grow bg-white/5" />
-          <div className="text-[9px] font-mono text-white/20 uppercase tracking-widest">
-            NODE_REF: {question.id.toUpperCase()}
-          </div>
         </div>
         
         <motion.h3 
@@ -54,7 +51,7 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({ question, onAnswer 
             className="group flex items-center gap-3 text-[10px] uppercase tracking-widest text-white/20 hover:text-white/60 transition-colors w-fit"
           >
             <span className="w-4 h-[1px] bg-current" />
-            {showContext ? 'Close Architecture' : 'Expose Diagnostic Logic'}
+            {showContext ? 'Close our thinking' : 'How this helps us plan'}
           </button>
 
           <AnimatePresence>
@@ -67,10 +64,9 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({ question, onAnswer 
                 className="overflow-hidden"
               >
                 <div className="p-6 bg-white/[0.02] border border-white/10 font-mono text-[10px] uppercase tracking-widest leading-relaxed text-white/40">
-                  <div className="mb-2 text-white/60">// Impact Vector Calibration:</div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>Confidence_Weight: {(question.confidenceImpact * 100).toFixed(0)}%</div>
-                    <div>Branching_Potential: {question.branchingRules.length > 0 ? 'DYNAMIC' : 'LINEAR'}</div>
+                  <div className="mb-2 text-white/60">// Consultant Focus:</div>
+                  <div className="grid grid-cols-1 gap-4">
+                    <p className="max-w-md">This answer helps us understand the scale of your current foundations and what will be required to support your next stage of growth.</p>
                   </div>
                 </div>
               </motion.div>
@@ -89,7 +85,6 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({ question, onAnswer 
             onClick={() => onAnswer(option.value)}
             className="group relative w-full text-left p-8 border border-white/5 bg-white/[0.02] hover:bg-white hover:text-black transition-all duration-500 overflow-hidden"
           >
-            {/* Engineered Selection indicator */}
             <div className="absolute top-0 left-0 w-[2px] h-full bg-white opacity-0 group-hover:opacity-100 transition-opacity" />
             
             <div className="relative z-10 flex flex-col gap-4">
@@ -97,23 +92,9 @@ const QuestionRenderer: React.FC<QuestionRendererProps> = ({ question, onAnswer 
                 <span className="text-lg font-bold tracking-tight uppercase">{option.label}</span>
                 <span className="opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-500">→</span>
               </div>
-              
-              {/* Optional signal delta hint */}
-              <div className="flex gap-2 opacity-0 group-hover:opacity-30 transition-opacity duration-700">
-                {option.signalDeltas.slice(0, 2).map((s, i) => (
-                  <span key={i} className="text-[8px] font-mono border border-current px-2 py-0.5">
-                    {s.signal.toUpperCase()}
-                  </span>
-                ))}
-              </div>
             </div>
 
-            {/* Background Texture on hover */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.05)_0%,transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity" />
-            
-            <div className="absolute bottom-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-               <span className="font-mono text-[10px]">0x0{idx+1}</span>
-            </div>
           </motion.button>
         ))}
       </div>

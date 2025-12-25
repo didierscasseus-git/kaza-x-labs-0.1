@@ -1,89 +1,61 @@
+
+/**
+ * Kaza X Labs - Senior Partner Intelligence Engine
+ */
 import { GoogleGenAI } from "@google/genai";
-import { SignalSet } from '../types';
 
 export type AIModelMode = 'speed' | 'precision' | 'deep-thought';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
-  image?: string; // base64
-  thinking?: string;
+  image?: string;
 }
-
-const getApiKey = () => {
-  try {
-    return process.env.API_KEY || "";
-  } catch (e) {
-    return "";
-  }
-};
 
 export const generateLabResponse = async (
   prompt: string, 
   mode: AIModelMode = 'precision',
-  image?: { data: string, mimeType: string },
-  systemContext?: { signals: SignalSet, confidence: number }
+  image?: { data: string, mimeType: string }
 ) => {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    throw new Error("COMMUNICATION_BREAKDOWN: API credentials unavailable.");
-  }
-
-  const ai = new GoogleGenAI({ apiKey });
-  const modelName = mode === 'speed' ? 'gemini-flash-lite-latest' : 'gemini-3-pro-preview';
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const config: any = {
-    temperature: 0.7,
-    topP: 0.95,
+  let modelName = 'gemini-3-flash-preview';
+  let config: any = {
+    systemInstruction: `You are a world-class senior partner at Kaza X Labs, a structural intervention firm. 
+    You provide high-level strategic perspective on brand modernization and technical architecture. 
+    Your tone is professional, clinical, precise, and authoritative. 
+    Focus on "structural friction" and "operational clutter". 
+    You do not speak like a software bot; you speak like a high-level consultant.`,
   };
 
   if (mode === 'deep-thought') {
-    config.thinkingConfig = { thinkingBudget: 32768 };
-  }
-
-  let fullPrompt = prompt;
-  if (systemContext) {
-    const { signals, confidence } = systemContext;
-    fullPrompt = `
-      [SYSTEM_CONTEXT_INJECTED]
-      User Diagnostic State:
-      - Technical Debt: ${signals.technicalDebt}/100
-      - Brand Clarity: ${signals.brandClarity}/100
-      - Business Maturity: ${signals.businessMaturity}/100
-      - Urgency: ${signals.urgency}/100
-      - Diagnostic Confidence: ${(confidence * 100).toFixed(0)}%
-      
-      INSTRUCTION: Integrate these signals into your analysis if relevant. Maintain a clinical, system-oriented tone.
-      
-      USER_QUERY: ${prompt}
-    `;
-  }
-
-  const parts: any[] = [{ text: fullPrompt }];
-  
-  if (image) {
-    parts.push({
-      inlineData: {
-        data: image.data,
-        mimeType: image.mimeType
-      }
-    });
+    modelName = 'gemini-3-pro-preview';
+    config.thinkingConfig = { thinkingBudget: 16000 };
   }
 
   try {
+    const contents = image 
+      ? {
+          parts: [
+            { inlineData: { data: image.data, mimeType: image.mimeType } },
+            { text: prompt }
+          ]
+        }
+      : { parts: [{ text: prompt }] };
+
     const response = await ai.models.generateContent({
       model: modelName,
-      contents: { parts },
+      contents,
       config
     });
 
-    if (!response) throw new Error("Null response");
-
     return {
-      text: response.text || "SYSTEM_ERROR: Empty signal returned.",
+      text: response.text || "I'm currently reviewing internal strategies. Please reach out via our request protocol.",
     };
   } catch (error) {
-    console.error("AI_LAB_ERROR:", error);
-    throw new Error("COMMUNICATION_BREAKDOWN: Infrastructure unavailable.");
+    console.error("Kaza Lab AI Error:", error);
+    return {
+      text: "Our partners are currently engaged in high-level sessions. Please utilize the request protocol for formal inquiries.",
+    };
   }
 };

@@ -1,72 +1,41 @@
-import { GoogleGenAI } from "@google/genai";
+
 import { SignalSet } from '../types';
 
 /**
- * Kaza X Labs - Controlled Narrative Engine
- * 
- * Rules:
- * 1. AI never determines track, pricing, or modules.
- * 2. AI only refines technical clarity and cause-effect mapping.
- * 3. Style must remain "System-Oriented" and "Plain Language".
+ * Kaza X Labs - Narrative Logic
+ * Provides deterministic proof bullets and action plans without exposing numeric scores.
  */
 
-const getApiKey = () => {
-  try {
-    return process.env.API_KEY || "";
-  } catch (e) {
-    return "";
+export const getWhyThisPath = (signals: SignalSet): string[] => {
+  const points: string[] = [];
+
+  if (signals.urgency > 70) {
+    points.push("Timeline alignment confirms immediate execution capacity for high-priority targets.");
+  } else {
+    points.push("Strategic window identified for structural hardening ahead of planned expansion.");
   }
-};
 
-export const getRefinedSummaryPrompt = (signals: SignalSet, staticSummary: string, track: string) => {
-  return `
-    ROLE: Technical Systems Architect at Kaza X Labs.
-    TASK: Rewrite the provided summary for a digital intervention proposal.
-    
-    DIAGNOSTIC DATA:
-    - Engagement Track: ${track}
-    - Technical Debt: ${signals.technicalDebt}/100
-    - Brand Clarity: ${signals.brandClarity}/100
-    - Automation Readiness: ${signals.automationReadiness}/100
-    - Urgency: ${signals.urgency}/100
-    
-    CORE SUMMARY (DETERMINISTIC):
-    "${staticSummary}"
-    
-    INSTRUCTIONS:
-    - Use plain, confident, system-oriented language.
-    - Explain the CAUSE-EFFECT relationship between the diagnostic data and the recommended track.
-    - Clarify technical TRADEOFFS (e.g., speed vs. depth if urgency is high).
-    - Avoid marketing fluff, adjectives like "amazing" or "world-class", and generic agency clichés.
-    - Do NOT suggest new services or change the pricing/track logic.
-    - Maximum 80 words.
-  `;
-};
-
-export const getRefinedReasoningPrompt = (title: string, reasoning: string, signalValue: number) => {
-  return `
-    REWRITE the reasoning for including the module "${title}".
-    CURRENT REASONING: "${reasoning}"
-    SIGNAL STRENGTH: ${signalValue}/100
-    
-    The tone should be clinical and objective. Focus on how the signal indicates a bottleneck that this module specifically resolves. 
-    15 words max.
-  `;
-};
-
-export const refineNarrative = async (prompt: string) => {
-  const apiKey = getApiKey();
-  if (!apiKey) return null;
-
-  const ai = new GoogleGenAI({ apiKey });
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-    });
-    return response.text?.trim() || "SIGNAL_REFINE_ERROR";
-  } catch (error) {
-    console.error("Narrative Engine Failure:", error);
-    return null;
+  if (signals.technicalDebt > 60) {
+    points.push("Direct resolution of technical bottlenecks required to restore operational velocity.");
+  } else if (signals.automationReadiness < 40) {
+    points.push("Codification of manual logic identified as the primary lever for throughput growth.");
   }
+
+  if (signals.brandClarity < 40) {
+    points.push("Identity-to-market sync confirmed as a critical path for high-tier trust acquisition.");
+  } else {
+    points.push("Engineering foundations mapped to existing operational volume for sustained stability.");
+  }
+
+  return points;
 };
+
+export const getImmediateWins = (): string[] => [
+  "Constraint map finalized and shared with the leadership board.",
+  "System surfaces ranked by immediate impact on conversion.",
+  "First automation candidate selected for the initial build sprint.",
+  "Structural tracking baseline created for zero-latency monitoring."
+];
+
+export const getRefinedSummaryPrompt = () => "";
+export const getRefinedReasoningPrompt = () => "";

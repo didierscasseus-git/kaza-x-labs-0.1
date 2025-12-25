@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Reveal from '../UI/Reveal';
 
@@ -12,20 +11,20 @@ const CaseStudyDetail: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
           <div className="lg:col-span-5">
             <Reveal>
-              <h2 className="text-[10px] uppercase tracking-[0.5em] text-neutral-500 mb-8 font-bold">Deep Dive / System Analysis</h2>
+              <h2 className="text-[10px] uppercase tracking-[0.5em] text-neutral-500 mb-8 font-bold">Analysis // The Outcome</h2>
             </Reveal>
             <Reveal delay={0.2}>
               <h3 className="font-heading text-4xl md:text-5xl font-bold text-white mb-12 tracking-tight">
-                Nexus Venture: Architecting for 10ms Latency.
+                Nexus Venture: Restoring Operational Clarity.
               </h3>
             </Reveal>
             <Reveal delay={0.3}>
               <div className="space-y-6 text-neutral-400 leading-relaxed font-light">
                 <p>
-                  To handle the complex data requirements of Nexus Venture, we implemented a distributed event-driven architecture. By decoupling the real-time processing layer from the primary persistence engine, we achieved a sustained 99.99% uptime during peak load.
+                  For Nexus Venture, the problem wasn't a lack of talent—it was a lack of structural sync. Their brand felt outdated, and their internal tools were too slow to keep up with their growth.
                 </p>
                 <p>
-                  The system leverages edge computing to minimize TTFB, ensuring a seamless experience across global nodes while maintaining strict consistency for critical transaction paths.
+                  We rebuilt their entire digital presence in 12 weeks. By unifying their visual narrative with a simplified, fast-loading system, we cleared the path for them to handle three times their previous volume without adding more manual friction.
                 </p>
               </div>
             </Reveal>
@@ -36,23 +35,19 @@ const CaseStudyDetail: React.FC = () => {
               <div className="bg-neutral-900 aspect-video w-full flex items-center justify-center border border-white/5 relative group overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent" />
                 <div className="text-[10px] font-mono text-neutral-600 uppercase tracking-widest text-center px-12 z-10">
-                   [ Visualizing Technical Layer: Distribution / Mesh / Auth ]
+                   [ Before & After: Structural Alignment Mapping ]
                 </div>
-                {/* Decorative Tech Accents */}
                 <div className="absolute top-8 left-8 w-4 h-4 border-l border-t border-white/20" />
                 <div className="absolute bottom-8 right-8 w-4 h-4 border-r border-b border-white/20" />
-                
-                {/* Simulated Scanning Line */}
-                <div className="absolute top-0 left-0 w-full h-[1px] bg-white/10 animate-[scan_4s_linear_infinite]" />
               </div>
             </Reveal>
             
             <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8">
               {[
-                { label: 'Throughput', value: '1.2M req/s' },
-                { label: 'Redundancy', value: '3-Node' },
-                { label: 'Security', value: 'E2E AES' },
-                { label: 'Deployment', value: 'Atomic' }
+                { label: 'Growth Capacity', value: '300%' },
+                { label: 'Trust Score', value: 'Optimal' },
+                { label: 'Manual Ops', value: '-60%' },
+                { label: 'Integrity', value: 'Verified' }
               ].map((stat, i) => (
                 <Reveal key={stat.label} delay={0.5 + (i * 0.1)}>
                   <div className="border-l border-white/10 pl-6">
@@ -65,15 +60,6 @@ const CaseStudyDetail: React.FC = () => {
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes scan {
-          0% { transform: translateY(0); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(400px); opacity: 0; }
-        }
-      `}</style>
     </section>
   );
 };

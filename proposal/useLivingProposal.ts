@@ -1,124 +1,86 @@
-import { useMemo, useState, useEffect } from 'react';
-import { useSystem } from '../system/systemContext';
+import { useMemo } from 'react';
 import { LivingProposal, ProposalModule, TimelinePhase, PricingBand } from './proposalTypes';
-import { determineRecommendation } from '../scoringModel';
-import { refineNarrative, getRefinedSummaryPrompt } from './narrativeHelpers';
+import { useSystem } from '../system/systemContext';
 
 export const useLivingProposal = () => {
-  const { signals, confidence } = useSystem();
-  const recommendation = determineRecommendation(signals, confidence);
-  const [refinedSummary, setRefinedSummary] = useState<string | null>(null);
-  const [isRefining, setIsRefining] = useState(false);
+  const { signals } = useSystem();
 
-  // Core Deterministic Proposal Structure
-  const baseProposal = useMemo((): LivingProposal => {
+  const proposal = useMemo((): LivingProposal => {
+    // These are the integrated layers of the Brand & Systems Rebuild.
     const modules: ProposalModule[] = [
       {
-        id: 'brand-recovery',
-        title: 'Brand Identity Realignment',
-        description: 'Deep positioning pivot and visual system engineering to resolve market fragmentation.',
-        reasoning: 'Signals indicate current brand clarity is below threshold for scaling.',
-        included: signals.brandClarity < 50,
+        id: 'brand-layer',
+        title: 'Brand Realignment',
+        description: 'Strategic modernization of your visual identity and core brand narrative.',
+        reasoning: 'Ensures your image reflects your current business authority.',
+        included: true,
         impact: 'FOUNDATIONAL'
       },
       {
-        id: 'web-infra',
-        title: 'High-Performance Web Architecture',
-        description: 'A headless, edge-first digital platform built for 10ms TTFB and infinite scale.',
-        reasoning: 'Technical debt levels suggest current infrastructure will bottleneck growth.',
-        included: signals.technicalDebt > 40 || signals.businessMaturity > 60,
+        id: 'tech-layer',
+        title: 'Digital Foundation',
+        description: 'Full-stack rebuild of your digital home to remove technical drag and debt.',
+        reasoning: 'Provides a fast, dependable core for all future growth.',
+        included: true,
         impact: 'HIGH'
       },
       {
-        id: 'automation-orchestration',
-        title: 'Business Logic Automation',
-        description: 'Custom API-driven pipelines to eliminate manual ops friction in lead flow and retention.',
-        reasoning: 'Automation readiness score confirms high ROI on workflow orchestration.',
-        included: signals.automationReadiness < 70,
+        id: 'ops-layer',
+        title: 'Operational Simplification',
+        description: 'Automation of high-friction manual tasks to clear your team’s daily workload.',
+        reasoning: 'Allows you to scale volume without increasing headcount.',
+        included: true,
         impact: 'MEDIUM'
-      },
-      {
-        id: 'growth-engine',
-        title: 'Growth Acceleration Protocol',
-        description: 'Performance optimization and conversion systems to breach the current growth ceiling.',
-        reasoning: 'Identified growth ceiling requires strategic conversion-layer intervention.',
-        included: signals.growthCeiling > 50,
-        impact: 'HIGH'
       }
     ];
 
     const pricing: PricingBand = {
-      min: signals.budgetElasticity < 20 ? 15000 : signals.budgetElasticity < 50 ? 30000 : 75000,
-      max: signals.budgetElasticity < 20 ? 30000 : signals.budgetElasticity < 50 ? 75000 : 250000,
+      min: 45000,
+      max: 125000,
       currency: 'USD'
     };
 
-    const isRapid = signals.urgency > 70;
     const timeline: TimelinePhase[] = [
       {
-        title: 'Discovery & Audit',
-        duration: isRapid ? '1 Week' : '3 Weeks',
-        deliverables: ['System Map', 'Technical Blueprint', 'Risk Registry']
+        title: 'The Review',
+        duration: '2 Weeks',
+        deliverables: ['System Map', 'Technical Blueprint']
       },
       {
-        title: 'Execution & Sprint Cycle',
-        duration: isRapid ? '4 Weeks' : '8 Weeks',
-        deliverables: ['Core Architecture', 'Visual Systems', 'Alpha Deployment']
+        title: 'The Rebuild',
+        duration: '8 Weeks',
+        deliverables: ['Identity Core', 'Digital Foundation']
       },
       {
-        title: 'Optimization & Handover',
-        duration: isRapid ? '1 Week' : '3 Weeks',
-        deliverables: ['Performance Stress Test', 'Documentation', 'Scale Launch']
+        title: 'The Handover',
+        duration: '2 Weeks',
+        deliverables: ['Team Training', 'System Documentation']
       }
     ];
 
     return {
-      track: recommendation.track,
-      title: recommendation.label,
-      summary: recommendation.snapshot, // Using the snapshot for the proposal summary
-      modules: modules.filter(m => m.included),
+      track: 'REBUILD_PROTOCOL',
+      title: 'The Brand & Systems Rebuild',
+      summary: "A single, 12-week intervention designed to bridge the gap between how your business is seen and how it actually works. We remove the clutter and replace it with a singular, high-performance foundation.",
+      modules,
       timeline,
       pricing,
       assumptions: [
-        'Decision authority remains with primary stakeholder.',
-        'Existing technical debt is documented and accessible.',
-        'Market conditions remain stable during execution.'
+        'Direct leadership access during the 12-week cycle.',
+        'Technical access provided within the first 48 hours.',
+        'Core business objectives remain stable throughout the engagement.'
       ],
       risks: [
-        signals.technicalDebt > 70 ? 'Legacy system fragility may delay integration.' : '',
-        signals.brandClarity < 30 ? 'Positioning pivot requires significant internal alignment.' : '',
-        isRapid ? 'Accelerated timeline increases resource intensity.' : ''
-      ].filter(Boolean),
-      nextActions: [
-        'Approve Strategic Surface Map',
-        'Execute Deposit & Retainer Protocol',
-        'Initialize System Mapping Workshop'
+        'Legacy data integrity may require an additional cleanup phase.',
+        'Internal culture shifts during operational simplification.'
       ],
-      confidence: confidence
+      nextActions: [
+        'Approve the Rebuild Roadmap',
+        'Initialize Phase 01: The Review'
+      ],
+      confidence: 1.0
     };
-  }, [signals, confidence, recommendation]);
+  }, []);
 
-  // AI-Assisted Narrative Enhancement
-  useEffect(() => {
-    let active = true;
-    const triggerRefinement = async () => {
-      setIsRefining(true);
-      const prompt = getRefinedSummaryPrompt(signals, baseProposal.summary, baseProposal.track);
-      const refined = await refineNarrative(prompt);
-      if (active && refined) {
-        setRefinedSummary(refined);
-        setIsRefining(false);
-      }
-    };
-
-    triggerRefinement();
-    return () => { active = false; };
-  }, [signals, baseProposal.summary, baseProposal.track]);
-
-  const proposal = useMemo(() => ({
-    ...baseProposal,
-    summary: refinedSummary || baseProposal.summary
-  }), [baseProposal, refinedSummary]);
-
-  return { proposal, signals, isRefining };
+  return { proposal, signals, isRefining: false };
 };

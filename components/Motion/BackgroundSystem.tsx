@@ -61,7 +61,7 @@ const BackgroundSystem: React.FC = () => {
         className="absolute bottom-[15%] right-[20%] select-none"
       >
         <div className="font-mono text-[10px] text-white/[0.04] uppercase tracking-[2.2em] rotate-90 origin-right whitespace-nowrap">
-          LAB_ENGINE_STATUS_READY
+          PARTNER_LED_PRECISION
         </div>
       </SpatialElement>
 

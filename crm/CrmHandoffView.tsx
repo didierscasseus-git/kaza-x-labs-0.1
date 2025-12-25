@@ -35,7 +35,6 @@ const CrmHandoffView: React.FC<CrmHandoffViewProps> = ({ onClose }) => {
       className="fixed inset-0 z-[130] bg-black/80 backdrop-blur-xl flex items-center justify-center p-6"
     >
       <div className="w-full max-w-xl bg-[#050505] border border-white/10 p-12 relative overflow-hidden">
-        {/* Aesthetic Background Grid */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
           <div className="w-full h-full border border-white" style={{ backgroundSize: '20px 20px', backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)' }} />
         </div>
@@ -44,7 +43,7 @@ const CrmHandoffView: React.FC<CrmHandoffViewProps> = ({ onClose }) => {
           onClick={onClose}
           className="absolute top-8 right-8 text-white/20 hover:text-white transition-colors"
         >
-          Close
+          Exit
         </button>
 
         <AnimatePresence mode="wait">
@@ -56,17 +55,17 @@ const CrmHandoffView: React.FC<CrmHandoffViewProps> = ({ onClose }) => {
               exit={{ opacity: 0, y: -10 }}
             >
               <div className="mb-12">
-                <span className="text-[9px] font-mono uppercase tracking-[0.5em] text-white/30 mb-4 block">Handoff Protocol // Secure Transfer</span>
-                <h3 className="text-3xl font-heading font-black text-white tracking-tighter uppercase mb-4">Lock your blueprint.</h3>
+                <span className="text-[9px] font-mono uppercase tracking-[0.5em] text-white/30 mb-4 block">Formalize Assessment // Partner Board</span>
+                <h3 className="text-3xl font-heading font-black text-white tracking-tighter uppercase mb-4">Transmit Roadmap.</h3>
                 <p className="text-neutral-500 text-sm font-light leading-relaxed">
-                  Provide your identity coordinates to finalize the diagnostic sync. Your system roadmap will be encrypted and delivered to your inbox.
+                  Provide valid contact coordinates to secure this roadmap. A partner will review your data and initialize the engagement sequence.
                 </p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-8 relative z-10">
                 <div className="space-y-6">
                   <div className="group">
-                    <label className="text-[8px] font-mono text-white/20 uppercase tracking-widest block mb-2 transition-colors group-focus-within:text-white/60">Email_Address*</label>
+                    <label className="text-[8px] font-mono text-white/20 uppercase tracking-widest block mb-2 transition-colors group-focus-within:text-white/60">Strategic_Email*</label>
                     <input 
                       required
                       type="email" 
@@ -93,7 +92,7 @@ const CrmHandoffView: React.FC<CrmHandoffViewProps> = ({ onClose }) => {
                         type="text" 
                         value={company}
                         onChange={(e) => setCompany(e.target.value)}
-                        placeholder="COMPANY_ID"
+                        placeholder="ENTITY"
                         className="w-full bg-white/[0.03] border border-white/10 px-4 py-4 text-xs font-mono tracking-widest text-white focus:outline-none focus:border-white/40 transition-all uppercase"
                       />
                     </div>
@@ -104,7 +103,7 @@ const CrmHandoffView: React.FC<CrmHandoffViewProps> = ({ onClose }) => {
                   disabled={isSubmitting || !email}
                   className="w-full py-6 bg-white text-black font-bold uppercase tracking-[0.3em] text-[10px] hover:bg-neutral-200 transition-colors disabled:opacity-50 relative overflow-hidden"
                 >
-                  <span className="relative z-10">{isSubmitting ? 'Syncing System Signals...' : 'Execute Handoff'}</span>
+                  <span className="relative z-10">{isSubmitting ? 'Transmitting Assessment Data...' : 'Transmit Roadmap'}</span>
                   {isSubmitting && (
                     <motion.div 
                       className="absolute bottom-0 left-0 h-1 bg-black/20"
@@ -130,15 +129,15 @@ const CrmHandoffView: React.FC<CrmHandoffViewProps> = ({ onClose }) => {
                   className="w-8 h-8 bg-white rounded-full"
                 />
               </div>
-              <h3 className="text-3xl font-heading font-black text-white tracking-tighter uppercase mb-4">Handoff Success.</h3>
+              <h3 className="text-3xl font-heading font-black text-white tracking-tighter uppercase mb-4">Transmission Successful.</h3>
               <p className="text-neutral-500 text-sm font-light leading-relaxed mb-12">
-                Lead identity verified. Diagnostic payload successfully ingested by CRM core. Check your inbox for the encrypted blueprint.
+                Your diagnostic roadmap is secured. A partner will review the structural findings and reach out to initiate Phase 01.
               </p>
               <button 
                 onClick={onClose}
                 className="text-[10px] uppercase tracking-widest font-bold border-b border-white/20 pb-1 hover:border-white transition-all text-white/40"
               >
-                Return to Laboratory
+                Return to Surface Map
               </button>
             </motion.div>
           )}

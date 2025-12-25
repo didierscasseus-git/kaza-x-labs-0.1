@@ -14,12 +14,11 @@ interface IntakeEngineProps {
 const IntakeEngine: React.FC<IntakeEngineProps> = ({ isOpen, onClose }) => {
   const { state, currentQuestion, submitAnswer, goBack, reset, setPhase, hasActiveSession } = useAdaptiveIntake();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [log, setLog] = useState<string[]>(['[SYSTEM] Diagnostic Kernel Initialized...', '[IO] Awaiting Input Calibration...']);
+  const [log, setLog] = useState<string[]>(['[PARTNER] Reviewing current status...', '[INFO] Awaiting your perspective...']);
   const logEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  // Focus Trapping Logic
   useEffect(() => {
     if (isOpen) {
       const focusableElements = containerRef.current?.querySelectorAll(
@@ -46,17 +45,17 @@ const IntakeEngine: React.FC<IntakeEngineProps> = ({ isOpen, onClose }) => {
     const node = currentQuestion;
     const label = node.answers.find(a => a.value === val)?.label || val;
     
-    setLog(prev => [...prev, `[USER_INPUT] Node: ${node.id} -> Value: ${label}`, `[PROC] Recalculating signal assembly...`]);
+    setLog(prev => [...prev, `[INPUT] Priority: ${label}`, `[REVIEW] Analyzing operational impact...`]);
 
     setTimeout(() => {
       submitAnswer(val);
       setIsProcessing(false);
-      setLog(prev => [...prev, `[SYSTEM] New Vector Predicted. Confidence: ${(state.confidenceScore * 100).toFixed(1)}%`]);
+      setLog(prev => [...prev, `[PARTNER] Clarity improved. Moving to the next area.`]);
     }, 1100);
   };
 
   const handleStart = () => {
-    setLog(prev => [...prev, '[SYSTEM] Diagnostic Loop Started. Engaged Phase: L0']);
+    setLog(prev => [...prev, '[START] Consultation initiated. Phase 1: Context.']);
     setPhase('loop');
   };
 
@@ -76,7 +75,6 @@ const IntakeEngine: React.FC<IntakeEngineProps> = ({ isOpen, onClose }) => {
           transition={TRANSITION_PRESETS.FADE}
           className="fixed inset-0 z-[100] bg-[#050505] flex items-center justify-center p-6 md:p-12 overflow-hidden outline-none"
         >
-          {/* Matrix Background */}
           <div className="absolute inset-0 opacity-[0.02] pointer-events-none" aria-hidden="true">
             <div className="grid grid-cols-12 h-full w-full">
               {Array.from({ length: 12 }).map((_, i) => (
@@ -85,16 +83,15 @@ const IntakeEngine: React.FC<IntakeEngineProps> = ({ isOpen, onClose }) => {
             </div>
           </div>
 
-          {/* Status Bar */}
           <div className="absolute top-0 left-0 w-full p-6 md:p-12 flex justify-between items-start z-40">
             <div className="flex flex-col gap-1">
               <div id="engine-title" className="text-[10px] font-mono uppercase tracking-[0.5em] text-white/30 flex items-center gap-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                Kernel_v2.5 // Laboratory_Diagnostic
+                Partner Consultation // Kaza X Labs
               </div>
               <div className="flex items-center gap-6 mt-6">
                 <div className="flex flex-col">
-                  <span className="text-[8px] font-mono text-white/20 uppercase tracking-[0.2em] mb-2">Confidence_Spectrum</span>
+                  <span className="text-[8px] font-mono text-white/20 uppercase tracking-[0.2em] mb-2">Clarity level</span>
                   <div className="flex gap-[1px]">
                     {Array.from({ length: 12 }).map((_, i) => (
                       <motion.div 
@@ -117,28 +114,26 @@ const IntakeEngine: React.FC<IntakeEngineProps> = ({ isOpen, onClose }) => {
                 onClick={reset} 
                 className="text-[9px] uppercase tracking-widest text-white/20 hover:text-white transition-colors focus:text-white outline-none"
               >
-                Reset_Core
+                Start Over
               </button>
               <button 
                 onClick={onClose} 
                 className="w-12 h-12 border border-white/10 flex items-center justify-center hover:border-white transition-colors bg-white/5 group focus:border-white outline-none"
-                aria-label="Exit Diagnostic Environment"
+                aria-label="Exit Meeting"
               >
                 <span className="text-xl group-hover:rotate-90 transition-transform duration-300">×</span>
               </button>
             </div>
           </div>
 
-          {/* Telemetry Log */}
           <div className="absolute bottom-12 left-12 w-64 hidden xl:flex flex-col gap-2 z-40 opacity-20 hover:opacity-100 transition-opacity">
-            <span className="text-[8px] font-mono text-white/40 uppercase tracking-widest border-b border-white/10 pb-2">Live_Telemetry</span>
+            <span className="text-[8px] font-mono text-white/40 uppercase tracking-widest border-b border-white/10 pb-2">Meeting Notes</span>
             <div className="h-32 overflow-y-auto font-mono text-[9px] text-neutral-500 space-y-1 scrollbar-hide">
               {log.map((entry, i) => <div key={i}>{entry}</div>)}
               <div ref={logEndRef} />
             </div>
           </div>
 
-          {/* Dynamic Content Core */}
           <div className="w-full h-full flex flex-col items-center justify-center py-24 relative z-10 overflow-y-auto">
             <AnimatePresence mode="wait">
               {state.phase === 'orientation' ? (
@@ -168,7 +163,7 @@ const IntakeEngine: React.FC<IntakeEngineProps> = ({ isOpen, onClose }) => {
                       />
                    </div>
                    <div className="flex flex-col items-center gap-2">
-                     <div className="text-[10px] font-mono text-white/40 uppercase tracking-[0.8em] animate-pulse">Recalibrating...</div>
+                     <div className="text-[10px] font-mono text-white/40 uppercase tracking-[0.8em] animate-pulse">Reviewing...</div>
                    </div>
                 </motion.div>
               ) : !state.isComplete ? (
@@ -196,7 +191,6 @@ const IntakeEngine: React.FC<IntakeEngineProps> = ({ isOpen, onClose }) => {
             </AnimatePresence>
           </div>
 
-          {/* Operational Controls */}
           {state.phase === 'loop' && !state.isComplete && !isProcessing && (
             <div className="absolute bottom-0 left-0 w-full p-6 md:p-12 flex justify-between items-end z-40">
               <button 
@@ -205,12 +199,12 @@ const IntakeEngine: React.FC<IntakeEngineProps> = ({ isOpen, onClose }) => {
                 className="group flex items-center gap-4 text-[10px] uppercase tracking-[0.3em] text-neutral-500 hover:text-white transition-colors disabled:opacity-0 focus:text-white outline-none"
               >
                 <div className="w-10 h-10 border border-white/5 flex items-center justify-center group-hover:border-white transition-colors">←</div>
-                <span>Reverse_Phase</span>
+                <span>Go Back</span>
               </button>
 
               <div className="flex flex-col items-end gap-3">
                 <div className="text-[9px] font-mono text-white/20 uppercase tracking-[0.4em]">
-                  Diagnostic_Iteration: {Object.keys(state.answers).length + 1} / 12
+                  Progress: {Object.keys(state.answers).length + 1} / 12
                 </div>
                 <div className="w-48 h-[1px] bg-white/5">
                   <motion.div 

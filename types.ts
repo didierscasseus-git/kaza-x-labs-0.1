@@ -1,4 +1,4 @@
-export interface ServiceItem {
+export interface EngagementLayer {
   id: string;
   title: string;
   tagline: string;
@@ -18,7 +18,20 @@ export interface ProcessStep {
   description: string;
 }
 
-// ACIE Core Types
+export type SystemClass = 
+  | 'Fragmented Operator System'
+  | 'Scaling Bottleneck Engine'
+  | 'Brand-Strong / System-Weak Chassis'
+  | 'Overbuilt / Under-Coordinated Stack'
+  | 'Lean but Volatile Growth Machine'
+  | 'Enterprise Drag System'
+  | 'Indeterminate Configuration';
+
+/**
+ * Kaza X Labs - Singular Engagement Model
+ */
+export type OutcomeTrack = 'REBUILD_PROTOCOL' | 'SYSTEM_REFACTOR' | 'IDENTITY_SYNC';
+
 export interface SignalSet {
   businessMaturity: number;
   brandClarity: number;
@@ -35,12 +48,10 @@ export interface SignalDelta {
   value: number;
 }
 
-export type ConditionOp = '>' | '>=' | '<' | '<=' | '==' | '!=';
-
 export interface Condition {
-  left: keyof SignalSet | 'confidence' | 'answeredCount' | 'intent';
-  op: ConditionOp;
-  right: number | string;
+  left: string;
+  op: '>' | '>=' | '<' | '<=' | '==' | '!=';
+  right: any;
 }
 
 export interface BranchRule {
@@ -52,31 +63,28 @@ export interface BranchRule {
 }
 
 export interface AnswerOption {
-  value: string;
   label: string;
-  signalDeltas: SignalDelta[];
-  nextOverride?: string;
+  value: any;
+  signalDeltas?: SignalDelta[];
 }
 
 export interface QuestionNode {
   id: string;
-  category: 'intent' | 'brand' | 'web' | 'automation' | 'build' | 'budget' | 'decision' | 'maturity';
+  category: string;
   prompt: string;
   subPrompt?: string;
-  answerType: 'single' | 'multi' | 'scale' | 'text';
+  answerType: 'single' | 'multi';
+  confidenceImpact: number;
   answers: AnswerOption[];
   branchingRules: BranchRule[];
-  confidenceImpact: number;
 }
-
-export type OutcomeTrack = 'STRATEGY_SESSION' | 'DIAGNOSTIC_AUDIT' | 'GUIDED_STARTER' | 'RAPID_DEPLOYMENT';
 
 export interface IntakeState {
   currentQuestionId: string;
   history: string[];
   answers: Record<string, any>;
-  signals: SignalSet;
-  confidenceScore: number;
   isComplete: boolean;
   phase: 'orientation' | 'loop' | 'summary';
+  signals: SignalSet;
+  confidenceScore: number;
 }

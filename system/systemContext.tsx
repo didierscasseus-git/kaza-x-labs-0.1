@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import { SignalSet } from '../types';
 import { INITIAL_SIGNALS } from './systemSignals';
@@ -27,6 +28,7 @@ export const SystemProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed && typeof parsed === 'object') {
+          // Ensure recovered signals match the SignalSet structure
           setSignals(parsed.signals || INITIAL_SIGNALS);
           setConfidence(parsed.confidence || 0.35);
         }

@@ -1,9 +1,11 @@
+
 import React, { useMemo } from 'react';
 import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
 import { useMousePosition } from '../../hooks/useMousePosition';
 
 interface SpatialElementProps {
-  children: React.ReactNode;
+  // Fix: Made children optional to support decorative elements that only use className for styling and do not require nested content.
+  children?: React.ReactNode;
   depth?: number; // -1 to 1 (back to front)
   driftIntensity?: number;
   rotationIntensity?: number;

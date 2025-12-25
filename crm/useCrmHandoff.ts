@@ -15,7 +15,6 @@ export const useCrmHandoff = () => {
   const assemblePayload = useCallback((identity: IdentityBlock): CRMLeadPayload => {
     const recommendation = determineRecommendation(signals, confidence);
     
-    // Determine termination reason based on intake state
     let terminationReason: CRMLeadPayload['terminationReason'] = 'MANUAL_EXIT';
     if (intakeState.isComplete) {
       if (intakeState.history.length >= 12) terminationReason = 'HARD_CAP';
@@ -23,37 +22,30 @@ export const useCrmHandoff = () => {
       else terminationReason = 'SOFT_TERMINATE';
     }
 
-    // FIX: Removed 'createdAt' and 'diagnostic' properties to align with CRMLeadPayload interface
     return {
       sessionId: `SESS_${Math.random().toString(36).substring(2, 12).toUpperCase()}`,
       leadId: `LEAD_${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
       timestamp: new Date().toISOString(),
-      
       identity,
-      
       intent: {
-        objective: intakeState.answers['primary_intent'] || 'unknown',
-        urgency: signals.urgency > 75 ? 'urgent' : signals.urgency > 50 ? 'soon' : signals.urgency > 25 ? 'planned' : 'exploring',
-        authority: signals.decisionAuthority > 80 ? 'sole' : signals.decisionAuthority > 50 ? 'shared' : signals.decisionAuthority > 25 ? 'committee' : 'unknown'
+        objective: intakeState.answers['primary_intent'] || 'REBUILD_PROTOCOL',
+        urgency: signals.urgency > 75 ? 'urgent' : 'soon',
+        authority: signals.decisionAuthority > 50 ? 'sole' : 'shared'
       },
-
       signals,
       confidenceScore: confidence,
       terminationReason,
-
       systemSnapshot: proposal.summary,
       primaryBottleneck: recommendation.bottleneck,
       recommendedTrack: recommendation.track,
       prioritySequence: recommendation.priorities,
-
       rawAnswers: intakeState.answers,
-
       metadata: {
-        device: typeof window !== 'undefined' ? (window.innerWidth < 768 ? 'mobile' : 'desktop') : 'unknown',
-        locale: typeof navigator !== 'undefined' ? navigator.language : 'en-US',
-        timezone: typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'UTC',
+        device: 'prototype_env',
+        locale: 'en-US',
+        timezone: 'UTC',
         pathHistory: intakeState.history,
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'unknown'
+        userAgent: 'Kaza_Prototype_Core'
       }
     };
   }, [signals, confidence, proposal, intakeState]);
@@ -62,19 +54,18 @@ export const useCrmHandoff = () => {
     setIsSubmitting(true);
     const payload = assemblePayload(identity);
     
-    // LOG: Full system state ready for CRM ingestion
-    console.log("KAZA_CRM_HANDOFF_PAYLOAD_ASSEMBLED", payload);
+    // Simulate data ingestion
+    console.log("KAZA_CRM_SIMULATION_INGESTED", payload);
 
     try {
-      // PROD: Replace with actual endpoint: POST /api/v1/handoff
-      await new Promise(resolve => setTimeout(resolve, 1800));
+      // Simulate network wait
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
-      // PERSIST: Clear session on success to prevent double submission
+      // Clear local session simulation
       localStorage.removeItem('kaza_labs_intake_session_v3');
-      
       setIsSuccess(true);
     } catch (err) {
-      console.error("CRM_HANDOFF_PROTOCOL_FAILED:", err);
+      console.error("SIMULATION_FAILURE", err);
     } finally {
       setIsSubmitting(false);
     }

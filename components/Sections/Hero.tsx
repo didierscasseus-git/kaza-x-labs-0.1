@@ -1,111 +1,167 @@
-import React from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { DURATION_TOKENS, EASING_TOKENS } from '../../constants/motionTokens';
+import React, { useRef } from 'react';
+import { motion, useInView, useScroll, useTransform, Variants, useReducedMotion } from 'framer-motion';
 
-const Hero: React.FC = () => {
-  const { scrollYProgress } = useScroll();
+interface HeroProps {
+  onOpenReview: () => void;
+}
+
+const Hero: React.FC<HeroProps> = ({ onOpenReview }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
   
-  // Transition values for the headline (fade out/scale slightly as we scroll)
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.25], [1, 0.96]);
+  // Triggers every time the section enters the viewport (once: false)
+  const isInView = useInView(containerRef, { amount: 0.15, once: false });
+  
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
 
-  // Transition values for the scroll-revealed subline
-  const sublineOpacity = useTransform(scrollYProgress, [0.12, 0.28], [0, 0.65]);
-  const sublineY = useTransform(scrollYProgress, [0.12, 0.28], [24, 0]);
+  // Global section transforms
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.96]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const sublineOpacity = useTransform(scrollYProgress, [0, 0.4], [1, 0.3]);
+
+  // Subtle X-axis Parallax for each line
+  const line1X = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const line2X = useTransform(scrollYProgress, [0, 1], [0, 40]);
+  const line3X = useTransform(scrollYProgress, [0, 1], [0, -20]);
+  const lineTransforms = [line1X, line2X, line3X];
 
   const lines = [
-    "Reimagined brands.",
-    "Engineered systems.",
-    "Built for what’s next."
+    "REIMAGINED BRANDS.",
+    "ENGINEERED SYSTEMS.",
+    "BUILT FOR WHAT’S NEXT.",
   ];
 
-  const containerVariants = {
-    hidden: { opacity: 1 },
+  // Orchestrator for high-level blocks (Headline -> Subline -> Button)
+  const containerVariants: Variants = {
+    hidden: { 
+      opacity: 0 
+    },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.12,
-        delayChildren: 0.4,
+        staggerChildren: 0.4, // Deliberate gap between major blocks
+        delayChildren: 0.2,
       }
     }
   };
 
-  const lineVariants = {
+  // Internal stagger for headline lines
+  const headlineVariants: Variants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.15,
+      }
+    }
+  };
+
+  const lineVariants: Variants = {
+    hidden: { 
+      y: prefersReducedMotion ? 0 : "110%", 
+      opacity: 0,
+      rotate: prefersReducedMotion ? 0 : 2
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      rotate: 0,
+      transition: { 
+        duration: 1.4, 
+        ease: [0.16, 1, 0.3, 1]
+      }
+    }
+  };
+
+  const fadeUpVariants: Variants = {
     hidden: { 
       opacity: 0, 
-      y: 20,
-      filter: 'blur(8px)'
+      y: prefersReducedMotion ? 0 : 30 
     },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      filter: 'blur(0px)',
-      transition: {
-        duration: DURATION_TOKENS.SLOW,
-        ease: EASING_TOKENS.PRECISION
+      transition: { 
+        duration: 1.6, 
+        ease: [0.16, 1, 0.3, 1] 
       }
     }
   };
 
   return (
-    <section className="relative min-h-[180vh] bg-[#0a0a0a] flex flex-col pt-[10vh]">
-      {/* Sticky container for the Hero elements */}
-      <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden">
+    <section 
+      ref={containerRef}
+      id="hero" 
+      className="relative min-h-screen bg-[#050505] flex flex-col justify-center items-center overflow-hidden"
+    >
+      <motion.div 
+        style={{ scale: heroScale, y: contentY }}
+        className="max-w-screen-xl mx-auto w-full px-6 md:px-12 relative z-10"
+      >
         <motion.div 
-          style={{ opacity: heroOpacity, scale: heroScale }}
-          className="max-w-screen-xl mx-auto w-full px-6 md:px-12 relative z-10 -translate-y-[12%]"
+          className="flex flex-col items-start md:items-center text-left md:text-center"
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
         >
-          {/* Primary Editorial Headline - Line by line reveal */}
-          <motion.div 
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="flex flex-col items-start md:items-center text-left md:text-center"
+          {/* Primary Headline with subtle X parallax */}
+          <motion.h1 
+            variants={headlineVariants}
+            className="font-heading text-6xl sm:text-7xl md:text-[8rem] lg:text-[10rem] leading-[0.82] tracking-tighter font-black text-white uppercase select-none"
           >
-            <h1 className="font-heading text-5xl sm:text-7xl md:text-[9.5rem] leading-[1.15] md:leading-[1.15] tracking-tight md:tracking-[-0.04em] font-extrabold text-white uppercase select-none max-w-[12ch]">
-              {lines.map((line, i) => (
-                <span key={i} className="block overflow-hidden pb-2">
-                  <motion.span 
-                    variants={lineVariants}
-                    className="block"
-                  >
-                    {line}
-                  </motion.span>
-                </span>
-              ))}
-            </h1>
-          </motion.div>
+            {lines.map((line, i) => (
+              <div key={i} className="block overflow-hidden pb-4 md:pb-6">
+                <motion.span 
+                  variants={lineVariants}
+                  style={{ x: prefersReducedMotion ? 0 : lineTransforms[i] }}
+                  className="block whitespace-nowrap origin-bottom-left"
+                >
+                  {line}
+                </motion.span>
+              </div>
+            ))}
+          </motion.h1>
 
-          {/* Scroll-Revealed Subline */}
+          {/* Secondary Headline (Subline) */}
           <motion.div 
-            style={{ 
-              opacity: sublineOpacity, 
-              y: sublineY,
-            }}
-            className="mt-24 flex justify-center w-full"
+            style={{ opacity: sublineOpacity }}
+            variants={fadeUpVariants}
+            className="mt-12 md:mt-20 flex justify-center w-full"
           >
-            <p className="text-lg md:text-xl text-white font-light leading-[1.7] max-w-[45ch] text-left md:text-center px-6">
-              We redesign identity, rebuild digital foundations, and engineer the systems that let modern companies scale with clarity.
+            <p className="text-xl md:text-3xl text-neutral-400 font-light leading-relaxed max-w-[36ch] text-left md:text-center uppercase tracking-tight">
+              A singular 12-week intervention. <br className="hidden md:block" /> 
+              We realign your <span className="text-white font-medium">brand identity</span> and <span className="text-white font-medium">operations</span> into a high-performance system.
             </p>
           </motion.div>
-        </motion.div>
 
-        {/* Ambient background indicator */}
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.05 }}
-          transition={{ delay: 2.5, duration: 2 }}
-          className="absolute bottom-12 left-6 md:left-12 text-neutral-800 text-[7px] tracking-[1.2em] uppercase font-mono pointer-events-none"
-        >
-          SYSTEM_ESTABLISHED // KERNEL_V2
+          {/* Diagnosis CTA */}
+          <motion.div
+            variants={fadeUpVariants}
+            className="mt-16 md:mt-24"
+          >
+            <button 
+              onClick={onOpenReview}
+              className="group flex flex-col items-center gap-6 transition-all hover:scale-105 active:scale-95 outline-none"
+            >
+              <div className="px-12 py-5 border border-white/20 bg-white/5 backdrop-blur-sm text-[11px] uppercase tracking-[0.6em] text-white font-bold group-hover:bg-white group-hover:text-black group-focus:bg-white group-focus:text-black transition-all">
+                The Diagnosis
+              </div>
+              <motion.div 
+                animate={prefersReducedMotion ? {} : { y: [0, 8, 0] }}
+                transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                className="w-[1px] h-16 bg-gradient-to-b from-white/40 to-transparent"
+              />
+            </button>
+          </motion.div>
         </motion.div>
+      </motion.div>
 
-        {/* Subtle bottom gradient to blend into content */}
-        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#0a0a0a] to-transparent pointer-events-none" />
+      {/* Atmospheric Ambience */}
+      <div className="absolute inset-0 pointer-events-none opacity-20" aria-hidden="true">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vh] bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03)_0%,transparent_70%)]" />
       </div>
-      
-      {/* Scrollable buffer */}
-      <div className="h-[80vh] pointer-events-none" />
     </section>
   );
 };
